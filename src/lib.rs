@@ -274,11 +274,20 @@ pub trait Worker<Args>: Send + Sync {
     }
 
     #[must_use]
+    #[deprecated(since = "0.10.2", note = "Please use opts2 instead.")]
     fn opts() -> WorkerOpts<Args, Self>
     where
         Self: Sized,
     {
         WorkerOpts::new()
+    }
+
+    #[must_use]
+    fn opts2(&self) -> WorkerOpts<Args, Self>
+    where
+        Self: Sized,
+    {
+        Self::opts()
     }
 
     // TODO: Make configurable through opts and make opts accessible to the
@@ -290,6 +299,7 @@ pub trait Worker<Args>: Send + Sync {
     /// Derive a class_name from the Worker type to be used with sidekiq. By default
     /// this method will
     #[must_use]
+    #[deprecated(since = "0.10.2", note = "Please use class_name2 instead.")]
     fn class_name() -> String
     where
         Self: Sized,
@@ -299,6 +309,15 @@ pub trait Worker<Args>: Send + Sync {
         let type_name = std::any::type_name::<Self>();
         let name = type_name.split("::").last().unwrap_or(type_name);
         name.to_case(Case::UpperCamel)
+    }
+
+    #[must_use]
+    fn class_name2(&self) -> String
+    where
+        Self: Sized,
+    {
+        #[allow(deprecated)]
+        Self::class_name()
     }
 
     async fn perform_async(redis: &RedisPool, args: Args) -> Result<()>
